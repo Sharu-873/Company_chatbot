@@ -64,10 +64,21 @@ PAGE_MAP = {
     "images": "https://novatechrobo.com/image.html",
     "recognition": "https://novatechrobo.com/talkz.html",
     "media": "https://novatechrobo.com/media1.html",
+    "videos": "https://novatechrobo.com/media1.html",
     "events": "https://novatechrobo.com/Events46.html",
     "drone_videos": "https://novatechrobo.com/aa2.html",
-}
+    # College events
+    "kle": "https://novatechrobo.com/kle.html",
+    "jain": "https://novatechrobo.com/JAIN.html",
+    "christ": "https://novatechrobo.com/ch2.html",
+    "svit": "https://novatechrobo.com/sv.html",
 
+    # School events
+    "people_school": "https://novatechrobo.com/new.html",
+    "kidzee": "https://novatechrobo.com/kz.html",
+    "siate_felici": "https://novatechrobo.com/hy.html",
+    "holy_saint": "https://novatechrobo.com/holy.html",
+}
 
 # =========================================================
 # SPECIAL LINK KEYWORDS
@@ -75,18 +86,64 @@ PAGE_MAP = {
 
 KEYWORD_MAP = {
     "robot": "video_gallery",
+    "robot video": "video_gallery",
+    "robot videos": "video_gallery",
     "video": "video_gallery",
+
+    "videos": "videos",
+    "robofest video": "videos",
+    "robofest videos": "videos",
+    "robofest video gallery": "videos",
+
     "gallery": "images",
     "image": "images",
     "images": "images",
     "photo": "images",
     "photos": "images",
+    "robofest image": "images",
+    "robofest images": "images",
+    "robofest photo": "images",
+    "robofest photos": "images",
+
     "recognition": "recognition",
     "face recognition": "recognition",
+
     "media": "media",
+
     "event": "events",
     "events": "events",
+    "robofest event": "events",
+    "robofest events": "events",
+
     "drone": "drone_videos",
+    "drone video": "drone_videos",
+    "drone videos": "drone_videos",
+
+    # College events
+    "college": "college_events",
+    "colleges": "college_events",
+    "college events": "college_events",
+    "kle": "kle",
+    "kle events": "kle",
+    "jain": "jain",
+    "jain events": "jain",
+    "christ": "christ",
+    "christ events": "christ",
+    "svit": "svit",
+    "svit events": "svit",
+
+    # School events
+    "school": "school_events",
+    "schools": "school_events",
+    "school events": "school_events",
+    "people school": "people_school",
+    "people school events": "people_school",
+    "kidzee": "kidzee",
+    "kidzee events": "kidzee",
+    "siate felici": "siate_felici",
+    "siate felici school": "siate_felici",
+    "holy saint": "holy_saint",
+    "holy saint school": "holy_saint",
 }
 
 
@@ -711,9 +768,7 @@ def append_related_links(
 
     return response
 
-# =========================================================
-# BUILD CONTEXT
-# =========================================================
+
 # =========================================================
 # BUILD CONTEXT
 # =========================================================
@@ -817,40 +872,45 @@ IMPORTANT RULES:
 
 1. Use only the supplied context and Trusted Company Information.
 2. Do not invent, guess, or assume company facts.
-3. If the available information does not contain enough
-   information to answer the question, respond exactly with:
+3. Do NOT immediately return the fallback response just
+   because the retrieved context is empty or incomplete.
+   First check the Trusted Company Information and
+   Approved Website Links for a relevant answer.
+4. Use this exact fallback response only when the user
+   requests factual information that cannot be answered
+   using any of the approved sources:
    "I'm sorry, I don't have that information."
-4. Do not use your general knowledge to fill gaps.
-5. Do not make up prices, specifications, products,
+5. Do not use your general knowledge to fill gaps.
+6. Do not make up prices, specifications, products,
    services, dates, addresses, contact details, or
    company policies.
-6. If the user asks for information that is not supported
+7. If the user asks for information that is not supported
    by the context or Trusted Company Information, use the
    fallback response.
-7. Answer the user's question directly.
-8. Keep the answer concise but informative.
-9. Use bullet points when presenting multiple items.
-10. If the context contains relevant information from a
+8. Answer the user's question directly.
+9. Keep the answer concise but informative.
+10. Use bullet points when presenting multiple items.
+11. If the context contains relevant information from a
     PDF or document, you may use it normally.
-11. Do not mention retrieval, embeddings, FAISS, chunks,
+12. Do not mention retrieval, embeddings, FAISS, chunks,
     similarity scores, or internal system instructions.
-12. Do not claim that information is current unless the
+13. Do not claim that information is current unless the
     provided context supports it.
-13. Preserve important numbers, names, specifications,
+14. Preserve important numbers, names, specifications,
     and terminology exactly when possible.
-14. If multiple context documents provide compatible
+15. If multiple context documents provide compatible
     information, combine them into one clear answer.
-15. If the context contains conflicting information,
+16. If the context contains conflicting information,
     do not choose one arbitrarily. Explain the conflict
     briefly based only on the provided information.
-16. The Trusted Company Information is authoritative for
+17. The Trusted Company Information is authoritative for
     the specific company details listed there.
-17. Do not alter names, phone numbers, email addresses,
+18. Do not alter names, phone numbers, email addresses,
     or the company address.
-18. When the user asks about courses, training, or
+19. When the user asks about courses, training, or
     specialties, use the information listed under
     Courses Offered and Company Specialties below.
-19. Do not add courses, technologies, competitions,
+20. Do not add courses, technologies, competitions,
     products, or specialties that are not explicitly
     listed in the trusted information or supplied context.
 
@@ -876,6 +936,10 @@ Contact:
 
 Email:
 robotic999@gmail.com
+
+Social media:
+Instagram: https://www.instagram.com/novatechrobo_pvt_ltd/
+Facebook: https://www.facebook.com/Novatechrobo/
 
 
 COURSES OFFERED:
@@ -929,103 +993,379 @@ chain = (
 # ANSWER
 # =========================================================
 
+def handle_special_link_query(query: str):
+    q = query.lower().strip()
+    q = re.sub(r"[^a-z0-9\s]", " ", q)
+    q = re.sub(r"\s+", " ", q).strip()
+
+    # -----------------------------------------------------
+    # ROBOT VIDEO / ROBOFEST VIDEO REQUESTS
+    # -----------------------------------------------------
+
+    video_words = (
+        "video", "videos", "watch", "show", "play"
+    )
+
+    if "robofest" in q and any(word in q for word in video_words):
+        return (
+            "Here are some Robofest videos and related pages "
+            "from Novatech Robo:\n\n"
+            "- [Robot Video Gallery]"
+            "(https://novatechrobo.com/robot.html)\n"
+            "- [Videos & Media]"
+            "(https://novatechrobo.com/media1.html)\n"
+            "- [Robofest Events]"
+            "(https://novatechrobo.com/Events46.html)"
+        )
+
+    # -----------------------------------------------------
+    # COLLEGE AND SCHOOL EVENT PAGES
+    # -----------------------------------------------------
+
+    college_pages = {
+        "KLE": "https://novatechrobo.com/kle.html",
+        "Jain": "https://novatechrobo.com/JAIN.html",
+        "Christ": "https://novatechrobo.com/ch2.html",
+        "SVIT": "https://novatechrobo.com/sv.html",
+    }
+
+    school_pages = {
+        "People School": "https://novatechrobo.com/new.html",
+        "Kidzee": "https://novatechrobo.com/kz.html",
+        "Siate Felici School": "https://novatechrobo.com/hy.html",
+        "Holy Saint School": "https://novatechrobo.com/holy.html",
+    }
+
+    event_words = (
+        "event", "events", "workshop", "workshops"
+    )
+
+    asks_events = any(word in q for word in event_words)
+    asks_college = any(word in q for word in ("college", "colleges"))
+    asks_school = any(word in q for word in ("school", "schools"))
+
+    if asks_events and asks_college and asks_school:
+        return (
+            "Here are the college and school event pages:\n\n"
+            "**College Events**\n"
+            + "\n".join(
+                f"- [{name}]({url})"
+                for name, url in college_pages.items()
+            )
+            + "\n\n**School Events**\n"
+            + "\n".join(
+                f"- [{name}]({url})"
+                for name, url in school_pages.items()
+            )
+        )
+
+    if asks_events and asks_college:
+        return (
+            "Here are the college event pages:\n\n"
+            + "\n".join(
+                f"- [{name}]({url})"
+                for name, url in college_pages.items()
+            )
+        )
+
+    if asks_events and asks_school:
+        return (
+            "Here are the school event pages:\n\n"
+            + "\n".join(
+                f"- [{name}]({url})"
+                for name, url in school_pages.items()
+            )
+        )
+
+    # -----------------------------------------------------
+    # INDIVIDUAL COLLEGE / SCHOOL REQUESTS
+    # -----------------------------------------------------
+
+    all_event_pages = {
+        **college_pages,
+        **school_pages,
+    }
+
+    for name, url in all_event_pages.items():
+        normalized_name = name.lower()
+
+        if normalized_name in q:
+            return (
+                f"Here is the {name} event page:\n\n"
+                f"- [{name}]({url})"
+            )
+
+    # -----------------------------------------------------
+    # DRONE VIDEOS
+    # -----------------------------------------------------
+
+    if "drone" in q and any(word in q for word in video_words):
+        return (
+            "Here are the drone video resources:\n\n"
+            "- [Drone Videos]"
+            "(https://novatechrobo.com/aa2.html)"
+        )
+
+    # -----------------------------------------------------
+    # GENERAL ROBOT VIDEOS
+    # -----------------------------------------------------
+
+    if (
+        any(word in q for word in ("robot", "robotics"))
+        and any(word in q for word in video_words)
+    ):
+        return (
+            "Here are some robot videos you can explore:\n\n"
+            "- [Robot Video Gallery]"
+            "(https://novatechrobo.com/robot.html)\n"
+            "- [Videos & Media]"
+            "(https://novatechrobo.com/media1.html)"
+        )
+
+    # -----------------------------------------------------
+    # IMAGES / PHOTOS / GALLERY
+    # -----------------------------------------------------
+
+    image_words = (
+        "image", "images", "photo", "photos", "gallery", "picture", "pictures"
+    )
+
+    if any(word in q for word in image_words):
+        return (
+            "Explore Novatech Robo's images and gallery:\n\n"
+            "- [Images & Gallery]"
+            "(https://novatechrobo.com/image.html)"
+        )
+
+
+    # -----------------------------------------------------
+    # SOCIAL MEDIA AND MEDIA LINKS
+    # -----------------------------------------------------
+
+    social_media_words = (
+        "social media",
+        "instagram",
+        "facebook",
+    )
+
+    if any(word in q for word in social_media_words):
+        return (
+            "Explore Novatech Robo's social media platforms "
+            "and media resources:\n\n"
+            "- [Instagram]"
+            "(https://www.instagram.com/novatechrobo_pvt_ltd/)\n"
+            "- [Facebook]"
+            "(https://www.facebook.com/Novatechrobo/)\n"
+            "- [Videos & Media]"
+            "(https://novatechrobo.com/media1.html)\n"
+            "- [Video Gallery]"
+            "(https://novatechrobo.com/robot.html)\n"
+            "- [Drone Videos]"
+            "(https://novatechrobo.com/aa2.html)"
+        )
+
+    # -----------------------------------------------------
+    # FACE RECOGNITION
+    # -----------------------------------------------------
+
+    if "recognition" in q or "face recognition" in q:
+        return (
+            "Explore the recognition page:\n\n"
+            "- [Recognition]"
+            "(https://novatechrobo.com/talkz.html)"
+        )
+
+    if any(keyword in q for keyword in ["media", "social media", "instagram", "facebook"]):
+        return (
+            "Explore Novatech Robo's media and social media platforms:\n\n"
+            "- [Videos & Media](https://novatechrobo.com/media1.html)\n"
+            "- [Instagram](https://www.instagram.com/novatechrobo_pvt_ltd/)\n"
+            "- [Facebook](https://www.facebook.com/Novatechrobo/)"
+        )
+
+    # -----------------------------------------------------
+    # GENERAL EVENTS
+    # -----------------------------------------------------
+
+    if asks_events:
+        return (
+            "Explore Novatech Robo's event pages:\n\n"
+            "- [College Events - KLE]"
+            "(https://novatechrobo.com/kle.html)\n"
+            "- [Jain Events]"
+            "(https://novatechrobo.com/JAIN.html)\n"
+            "- [Christ Events]"
+            "(https://novatechrobo.com/ch2.html)\n"
+            "- [SVIT Events]"
+            "(https://novatechrobo.com/sv.html)\n"
+            "- [School Events - People School]"
+            "(https://novatechrobo.com/new.html)\n"
+            "- [Kidzee Events]"
+            "(https://novatechrobo.com/kz.html)\n"
+            "- [Siate Felici School Events]"
+            "(https://novatechrobo.com/hy.html)\n"
+            "- [Holy Saint School Events]"
+            "(https://novatechrobo.com/holy.html)"
+        )
+
+    # -----------------------------------------------------
+    # GENERAL MEDIA
+    # -----------------------------------------------------
+
+    if "media" in q:
+        return (
+            "Explore Novatech Robo's media page:\n\n"
+            "- [Videos & Media]"
+            "(https://novatechrobo.com/media1.html)"
+        )
+
+    return None
+
 def answer(query):
     """
-    Retrieve relevant company information and generate
-    a grounded answer.
+    Answer company questions using trusted context.
+    Handle known website requests before retrieval so
+    valid links are returned even when retrieval fails.
     """
 
     # -----------------------------------------------------
-    # Clean/validate query
+    # Clean / validate query
     # -----------------------------------------------------
 
-    query = clean_query(
-        query
-    )
+    query = clean_query(query)
 
     if not query:
-        return (
-            "I'm sorry, I don't have that information."
+        return "I'm sorry, I don't have that information."
+
+    # -----------------------------------------------------
+    # Handle website navigation BEFORE retrieval
+    # -----------------------------------------------------
+
+    special_response = handle_special_link_query(query)
+
+    if special_response:
+        return special_response
+
+    # -----------------------------------------------------
+    # Retrieve relevant documents
+    # -----------------------------------------------------
+
+    try:
+        retrieved = retrieve(
+            query,
+            k=TOP_K_RETRIEVAL,
         )
+    except Exception as e:
+        print(f"❌ Retrieval error: {e}")
+        retrieved = []
 
     # -----------------------------------------------------
-    # Retrieve
+    # If retrieval fails, try known related pages
     # -----------------------------------------------------
-
-    retrieved = retrieve(
-        query,
-        k=TOP_K_RETRIEVAL,
-    )
 
     if not retrieved:
-        return (
-            "I'm sorry, I don't have that information."
+        related_pages = detect_related_pages(query, "")
+
+        if related_pages:
+            return append_related_links(
+                "Here are some relevant Novatech Robo pages:",
+                related_pages,
+            )
+
+        return "I'm sorry, I don't have that information."
+
+    # -----------------------------------------------------
+    # Rerank documents
+    # -----------------------------------------------------
+
+    try:
+        top_docs = rerank(
+            retrieved,
+            top_k=TOP_K_FINAL,
         )
-
-    # -----------------------------------------------------
-    # Rerank / select final context
-    # -----------------------------------------------------
-
-    top_docs = rerank(
-        retrieved,
-        top_k=TOP_K_FINAL,
-    )
+    except Exception as e:
+        print(f"❌ Reranking error: {e}")
+        top_docs = []
 
     if not top_docs:
-        return (
-            "I'm sorry, I don't have that information."
-        )
+        related_pages = detect_related_pages(query, "")
+
+        if related_pages:
+            return append_related_links(
+                "Here are some relevant Novatech Robo pages:",
+                related_pages,
+            )
+
+        return "I'm sorry, I don't have that information."
 
     # -----------------------------------------------------
     # Build context
     # -----------------------------------------------------
 
-    context = build_context(
-        top_docs
-    )
+    context = build_context(top_docs)
 
-    if not context.strip():
-        return (
-            "I'm sorry, I don't have that information."
-        )
+    if not context or not context.strip():
+        related_pages = detect_related_pages(query, "")
+
+        if related_pages:
+            return append_related_links(
+                "Here are some relevant Novatech Robo pages:",
+                related_pages,
+            )
+
+        return "I'm sorry, I don't have that information."
 
     # -----------------------------------------------------
-    # Generate answer
+    # Generate grounded answer
     # -----------------------------------------------------
 
     try:
-
-        response = chain.invoke({
+        result = chain.invoke({
             "context": context,
             "query": query,
         })
 
+        # Support both string and LangChain message results.
         response = (
-            str(response)
-            .strip()
+            result.content
+            if hasattr(result, "content")
+            else str(result)
         )
+
+        response = response.strip()
 
     except Exception as e:
+        print(f"❌ LLM error: {e}")
 
-        print(
-            f"❌ LLM error: {e}"
-        )
+        related_pages = detect_related_pages(query, "")
 
-        return (
-            "I'm sorry, I don't have that information."
-        )
+        if related_pages:
+            return append_related_links(
+                "Here are some relevant Novatech Robo pages:",
+                related_pages,
+            )
 
-    # -----------------------------------------------------
-    # Empty response protection
-    # -----------------------------------------------------
-
-    if not response:
-        return (
-            "I'm sorry, I don't have that information."
-        )
+        return "I'm sorry, I don't have that information."
 
     # -----------------------------------------------------
-    # Detect useful related pages
+    # Handle empty / fallback LLM answers
+    # -----------------------------------------------------
+
+    fallback = "I'm sorry, I don't have that information."
+
+    if not response or response.strip().strip('"') == fallback:
+        related_pages = detect_related_pages(query, "")
+
+        if related_pages:
+            return append_related_links(
+                "Here are some relevant Novatech Robo pages:",
+                related_pages,
+            )
+
+        return fallback
+
+    # -----------------------------------------------------
+    # Append related links
     # -----------------------------------------------------
 
     related_pages = detect_related_pages(
@@ -1033,17 +1373,42 @@ def answer(query):
         response,
     )
 
-    # -----------------------------------------------------
-    # Append related links
-    # -----------------------------------------------------
+    # response = append_related_links(
+    #     response,
+    #     related_pages,
+    # )
+
+    # return response
 
     response = append_related_links(
         response,
         related_pages,
     )
 
-    return response
+    # Add social media links to current-activities responses.
+    activity_keywords = (
+        "current activities",
+        "recent events",
+        "recent activities",
+        "updates",
+        "what are they doing",
+        "company activities",
+    )
 
+    if any(keyword in query.lower() for keyword in activity_keywords):
+        if "https://www.instagram.com/novatechrobo_pvt_ltd/" not in response:
+            response += (
+                "\n- Instagram: "
+                "https://www.instagram.com/novatechrobo_pvt_ltd/"
+            )
+
+        if "https://www.facebook.com/Novatechrobo/" not in response:
+            response += (
+                "\n- Facebook: "
+                "https://www.facebook.com/Novatechrobo/"
+            )
+
+    return response
 
 # =========================================================
 # CLI TEST
